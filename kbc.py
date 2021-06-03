@@ -10,9 +10,10 @@ def isAnswerCorrect(question, answer):
         True if the answer is correct
         False if the answer is incorrect
     '''
-
-    return True if answer == 2 else False      #remove this
-
+    if question["answer"] == answer:
+        return True
+    else:
+        return False
 
 def lifeLine(ques):
 
@@ -20,6 +21,15 @@ def lifeLine(ques):
     :param ques: The question for which the lifeline is asked for. (Type JSON)
     :return: delete the key for two incorrect options and return the new ques value. (Type JSON)
     '''
+    print("Erasing two incorrect options...")
+    print("Options remaining:")
+    i = 1
+    while i<=4:
+        if i == ques["answer"]:
+            print(f'\tOption',i,':',ques["option"+str(i)])
+            break
+        i+=1
+    print(f'\tOption',i%4+1,':',ques["option"+str((i%4)+1)])
 
 
 def kbc():
@@ -45,30 +55,58 @@ def kbc():
     '''
 
     #  Display a welcome message only once to the user at the start of the game.
+    print("Welcome to the game")
+    min_amount = 0
+    amount = 0
+    ll = True
+    i = 0
     #  For each question, display the prize won until now and available life line.
     # For now, the below code works for only one question without LIFE-LINE and QUIT checks
-
-    print(f'\tQuestion 1: {QUESTIONS[0]["name"]}' )
-    print(f'\t\tOptions:')
-    print(f'\t\t\tOption 1: {QUESTIONS[0]["option1"]}')
-    print(f'\t\t\tOption 2: {QUESTIONS[0]["option2"]}')
-    print(f'\t\t\tOption 3: {QUESTIONS[0]["option3"]}')
-    print(f'\t\t\tOption 4: {QUESTIONS[0]["option4"]}')
-    ans = input('Your choice ( 1-4 ) : ')
-
-    # check for the input validations
-
-    if isAnswerCorrect(QUESTIONS[0], int(ans) ):
-        # print the total money won.
-        # See if the user has crossed a level, print that if yes
-        print('\nCorrect !')
-
-    else:
-        # end the game now.
-        # also print the correct answer
-        print('\nIncorrect !')
-
-    # print the total money won in the end.
-
-
+    while i < 15:
+        print(f'\tQuestion',i+1 ,':',QUESTIONS[i]["name"])
+        print(f'\t\tOptions:')
+        print(f'\t\t\tOption 1: {QUESTIONS[i]["option1"]}')
+        print(f'\t\t\tOption 2: {QUESTIONS[i]["option2"]}')
+        print(f'\t\t\tOption 3: {QUESTIONS[i]["option3"]}')
+        print(f'\t\t\tOption 4: {QUESTIONS[i]["option4"]}')
+        ans = input('Your choice (1-4):')
+        # check for the input validations
+        if ans == 'lifeline':
+            if ll:
+                if i!=14:
+                    lifeLine(QUESTIONS[i])
+                    ans = input('Your choice from remaining options:')
+                else:
+                    while ans == 'lifeline':
+                        print("No lifeline for this question!")
+                        ans = input('Your choice (1-4):')
+                ll = False
+            else:
+                while ans == 'lifeline':
+                    print("No lifeline available")
+                    ans = input('Your choice (1-4):')
+        if ans == 'quit':
+            break
+        if isAnswerCorrect(QUESTIONS[i], int(ans)):
+            print('Correct!')
+            # print the total money won.
+            amount = QUESTIONS[i]["money"]
+            print("Amount won until now: Rs. ",amount)
+            # See if the user has crossed a level, print that if yes
+            if i == 4:
+                print("Level 1 cleared!")
+                min_amount = 10000
+            if i == 9:
+                print("Level 2 cleared!")
+                min_amount = 320000
+        else:
+            # end the game now.
+            # also print the correct answer
+            print('\nIncorrect Answer!')
+            print('The correct answer is option',QUESTIONS[i]["answer"])
+            amount = min_amount
+            break
+        i += 1
+    #print the total money won in the end
+    print("Final amount: Rs.", amount)
 kbc()
